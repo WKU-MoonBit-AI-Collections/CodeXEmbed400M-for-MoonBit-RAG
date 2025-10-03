@@ -81,7 +81,7 @@ python scripts/complement.py
 docker compose up -d
 python scripts/create-vecdb.py
 python scripts/search-vecdb.py # Just for test
-
+```
 
 ## Model
 
