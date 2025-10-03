@@ -32,6 +32,28 @@ def load_model():
     os.environ["HF_DATASETS_OFFLINE"] = "1"
     os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
     
+    # Ensure pooling configuration exists (same as create-vecdb.py)
+    pooling_config_path = os.path.join(MODEL_PATH, "1_Pooling", "config.json")
+    if not os.path.exists(pooling_config_path):
+        print("   Creating pooling configuration...")
+        os.makedirs(os.path.dirname(pooling_config_path), exist_ok=True)
+        
+        pooling_config = {
+            "word_embedding_dimension": 1024,
+            "pooling_mode_cls_token": True,
+            "pooling_mode_mean_tokens": False,
+            "pooling_mode_max_tokens": False,
+            "pooling_mode_mean_sqrt_len_tokens": False,
+            "pooling_mode_weightedmean_tokens": False,
+            "pooling_mode_lasttoken": False,
+            "include_prompt": True
+        }
+        
+        with open(pooling_config_path, 'w', encoding='utf-8') as f:
+            import json
+            json.dump(pooling_config, f, indent=4)
+        print(f"   Pooling config created: {pooling_config_path}")
+    
     # Load model
     model = SentenceTransformer(
         MODEL_PATH, 
