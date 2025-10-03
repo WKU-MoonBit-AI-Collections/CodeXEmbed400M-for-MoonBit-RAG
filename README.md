@@ -44,7 +44,7 @@ A high-performance semantic search system for MoonBit documentation using SFR-Em
 ┌──────────────────────────────────────────────────────────────────┐
 │                      Embedding Model Layer                        │
 │  ┌────────────────────────────────────────────────────────────┐  │
-│  │  SFR-Embedding-Code-400M_R                                 │  │
+│  │  CodeXEmbed (SFR-Embedding-Code-400M_R)                   │  │
 │  │  • Dimension: 1024                                         │  │
 │  │  • Type: Sentence Transformer                              │  │
 │  │  • Specialization: Code & Technical Documentation          │  │
@@ -69,18 +69,25 @@ A high-performance semantic search system for MoonBit documentation using SFR-Em
 
 ## Quick Start
 
-### 1. Prerequisites
+```bash
+git clone https://github.com/MoonBit-Dev/MoonBit-Doc-VectorDB.git
+cd MoonBit-Doc-VectorDB
+pip install -r requirements.txt
+npm install
+git submodule update --init --recursive
+python scripts/unity.py
+node scripts/extract.js processed
+python scripts/complement.py
+docker compose up -d
+python scripts/create-vecdb.py
+python scripts/search-vecdb.py # Just for test
 
-- Python 3.11+
-- Required packages:
-  ```bash
-  pip install -r requirements.txt
-  ```
 
-### 2. Download Model
+## Model
 
-The system uses [SFR-Embedding-Code-400M_R](https://huggingface.co/Salesforce/SFR-Embedding-Code-400M_R).
+The system uses [SFR-Embedding-Code-400M_R](https://huggingface.co/Salesforce/SFR-Embedding-Code-400M_R) (CodeXEmbed) for generating 1024-dimensional embeddings optimized for code and technical documentation.
 
+## Project Structure
 
 ```
 MoonBit-Docs-VectorDB/
