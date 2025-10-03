@@ -8,7 +8,7 @@ A high-performance semantic search system for MoonBit documentation using SFR-Em
 
 - **High-Precision Search**: 1024-dimensional embeddings with 0.94-0.99 similarity scores
 - **Offline-First**: Fully functional without internet connection
-- **Production-Ready**: HNSW/IVF indexing for efficient retrieval
+- **Production-Ready**: IVF indexing for efficient retrieval
 - **Lightweight**: Single-file database using Milvus Lite
 - **Bilingual**: Supports both English and Chinese queries
 
