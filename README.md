@@ -65,7 +65,7 @@ A high-performance semantic search system for MoonBit documentation using SFR-Em
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-![System Architecture](method.svg)
+
 
 ## Quick Start
 
