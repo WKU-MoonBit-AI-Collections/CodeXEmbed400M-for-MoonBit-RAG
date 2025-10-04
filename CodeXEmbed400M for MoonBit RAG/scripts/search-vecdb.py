@@ -89,11 +89,7 @@ try:
     print(f"   Index type: {index_type}")
     print(f"   Metric: {metric_type}")
     
-    if index_type == 'HNSW':
-        params = index_info.params.get('params', {})
-        print(f"   M: {params.get('M', 'N/A')}")
-        print(f"   Search will use ef=128")
-    elif index_type == 'IVF_FLAT':
+    if index_type == 'IVF_FLAT':
         params = index_info.params.get('params', {})
         print(f"   nlist: {params.get('nlist', 'N/A')}")
         print(f"   Search will use nprobe=16")
@@ -116,9 +112,8 @@ def search_similar_docs(query_text, top_k=5):
     )
     query_vector_list = query_vector.tolist()
     
-    # Get actual metric type from collection
-    actual_metric = "COSINE"  # Default
-    index_type = "HNSW"  # Default
+    # Get index type from collection (metric is always COSINE)
+    index_type = "IVF_FLAT"  # Default for Milvus Lite
     
     try:
         # Only connect if not already connected
@@ -128,21 +123,18 @@ def search_similar_docs(query_text, top_k=5):
         collection = Collection(COLLECTION_NAME)
         index_info = collection.index()
         
-        # Get actual metric and index type from collection
-        actual_metric = index_info.params.get('metric_type', 'COSINE')
-        index_type = index_info.params.get('index_type', 'HNSW')
+        # Get actual index type from collection
+        index_type = index_info.params.get('index_type', 'IVF_FLAT')
         
-        print(f"Using index: {index_type}, metric: {actual_metric}")
+        print(f"Using index: {index_type}, metric: COSINE")
         
     except Exception as e:
         print(f"Warning: Could not read index info, using defaults: {e}")
     
-    # Set search parameters based on actual metric and index type
-    search_params = {"metric_type": actual_metric}
+    # Set search parameters for IVF_FLAT with COSINE metric
+    search_params = {"metric_type": "COSINE"}
     
-    if index_type == 'HNSW':
-        search_params["params"] = {"ef": 128}
-    elif index_type in ['IVF_FLAT', 'IVF_PQ']:
+    if index_type in ['IVF_FLAT', 'IVF_PQ']:
         search_params["params"] = {"nprobe": 16}
     # For FLAT index, no additional params needed
     
@@ -155,32 +147,17 @@ def search_similar_docs(query_text, top_k=5):
         search_params=search_params
     )
     
-    # Display results with proper score formatting
+    # Display results with cosine similarity
     print(f"\nQuery: {query_text}")
     print(f"\nFound {len(results[0])} similar documents:")
     
     for i, hit in enumerate(results[0]):
-        # Format score based on actual metric
-        if actual_metric == "COSINE":
-            # For cosine: similarity = 1 - distance, but clamp to [0,1]
-            similarity_score = max(0.0, min(1.0, 1.0 - hit['distance']))
-            score_label = "Cosine Similarity"
-        elif actual_metric == "L2":
-            # For L2: smaller distance = more similar
-            similarity_score = hit['distance']
-            score_label = "L2 Distance"
-        elif actual_metric == "IP":
-            # For Inner Product: higher = more similar
-            similarity_score = hit['distance']
-            score_label = "Inner Product"
-        else:
-            # Unknown metric: show raw distance
-            similarity_score = hit['distance']
-            score_label = "Distance"
+        # Cosine similarity = 1 - distance, clamped to [0,1]
+        similarity_score = max(0.0, min(1.0, 1.0 - hit['distance']))
         
         print(f"\nResult {i+1}:")
         print(f"  File: {hit['entity']['file_name']}")
-        print(f"  {score_label}: {similarity_score:.4f}")
+        print(f"  Cosine Similarity: {similarity_score:.4f}")
         print(f"  Content: {hit['entity']['content'][:200]}...")
     
     return results[0]
